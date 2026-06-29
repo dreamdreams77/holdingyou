@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holding You</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #2d1b4e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.8em;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .tagline {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.95em;
+            margin-bottom: 30px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .player-wrap {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 35px;
+        }
+
+        audio {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .lyrics-wrap {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 35px 40px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section:last-child { margin-bottom: 0; }
+
+        .section-label {
+            font-size: 0.75em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(192,57,43,0.8);
+            margin-bottom: 14px;
+        }
+
+        .lyric-line {
+            display: block;
+            color: rgba(255,255,255,0.35);
+            font-size: 1.15em;
+            line-height: 1.9;
+            transition: color 0.2s ease;
+            min-height: 1.9em;
+        }
+
+        .lyric-line.active { color: rgba(255,255,255,0.95); }
+
+        .word {
+            display: inline;
+            transition: color 0.08s ease, text-shadow 0.08s ease;
+        }
+
+        .word.lit {
+            color: #c0392b;
+            text-shadow: 0 0 12px rgba(192,57,43,0.6);
+            font-weight: 600;
+        }
+
+        .liner-btn {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 12px 28px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            margin-bottom: 20px;
+        }
+
+        .liner-btn:hover {
+            background: rgba(255,255,255,0.14);
+            color: white;
+        }
+
+        .liner-notes {
+            display: none;
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 35px 40px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .liner-notes.open { display: block; }
+
+        .liner-notes h2 {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .liner-notes h3 {
+            color: rgba(192,57,43,0.9);
+            font-size: 0.85em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 22px 0 10px;
+        }
+
+        .liner-notes p {
+            font-size: 0.95em;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .chord-block {
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid rgba(192,57,43,0.6);
+            padding: 14px 18px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 12px 0;
+            line-height: 2;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .grid-item {
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid rgba(192,57,43,0.5);
+            padding: 12px 14px;
+            border-radius: 4px;
+            font-size: 0.88em;
+            line-height: 1.6;
+        }
+
+        .grid-item strong {
+            display: block;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .hint {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8em;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.9em; }
+            .lyrics-wrap, .liner-notes { padding: 25px 22px; }
+            .lyric-line { font-size: 1.05em; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Holding You</h1>
+    <p class="tagline">🎵 Lyrics highlight as you listen</p>
+
+    <div class="player-wrap">
+        <audio id="player" controls>
+            <source src="holding-you.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="lyrics-wrap" id="lyricsWrap"></div>
+
+    <button class="liner-btn" id="linerBtn">📋 Liner Notes</button>
+
+    <div class="liner-notes" id="linerNotes">
+        <h2>Production & Arrangement Notes</h2>
+        <p><strong>Written and Produced by Laura Johnston</strong></p>
+        <p><strong>BPM:</strong> 74–80 (slow but driving) &nbsp;|&nbsp; <strong>Key:</strong> D minor or C minor</p>
+        <p><strong>Mood:</strong> Intimate but burdened. Heavy pulse beneath breathy truth. Survival, not sweetness.</p>
+
+        <h3>Chord Progressions</h3>
+        <div class="chord-block">
+            <div><strong>Verse:</strong> Dm – Bb – F – Gm</div>
+            <div><strong>Chorus:</strong> Bb – Dm – Gm – F</div>
+            <div><strong>Bridge:</strong> Gm – Dm – Bb – C</div>
+            <div><strong>Final Chorus:</strong> Bb – Dm – Gm – Dm</div>
+        </div>
+
+        <h3>Vocal Production</h3>
+        <p>Lead vocal breathy with chest resonance underneath. Occasional strained or cracked edges on emotional lines. Double-tracked low vocal in choruses for weight. Whisper harmonies replaced with shadowy, distorted backing layers.</p>
+        <p><strong>Breath Placement:</strong> Verses audible but heavier, like someone steadying themselves. Before "Holding, just holding" — deeper inhale, almost trembling. Bridge breath becomes part of the rhythm. Final Chorus controlled but weighted, less airy, more grounded.</p>
+        <p><strong>Mix:</strong> Slight saturation, close and centered, boost low mids for warmth.</p>
+
+        <h3>Instrumentation</h3>
+        <div class="grid">
+            <div class="grid-item"><strong>Pads</strong>Analog synths with slight distortion (Juno + Prophet blend). Grit, widened with chorus effect.</div>
+            <div class="grid-item"><strong>Bass</strong>Thick warm sub with gentle overdrive. Saturated, sidechained subtly to kick.</div>
+            <div class="grid-item"><strong>Percussion</strong>Deep kick, muted toms, metallic shimmers, reverse impacts.</div>
+            <div class="grid-item"><strong>Textures</strong>Granular noise beds, reversed vocal fragments, low growl synths, cinematic booms, filtered noise sweeps.</div>
+        </div>
+
+        <h3>Arrangement</h3>
+        <p><strong>Intro:</strong> Sub-bass rumble + slow cinematic pulse.</p>
+        <p><strong>Verse:</strong> Dark pads, low-passed plucks, heartbeat kick with reverb tail. Narrow and tense.</p>
+        <p><strong>Chorus:</strong> Heavy bass swell, wide stereo pads, distorted texture layers. Emotional heaviness, not brightness.</p>
+        <p><strong>Bridge:</strong> Drop to single drone with tension-building risers. Minimal but ominous.</p>
+        <p><strong>Final Chorus:</strong> Gritty low-end, subtle saturation, emotional lift without going "big." Full weight, grounded, survival-tone.</p>
+
+        <h3>Spatial Design</h3>
+        <p><strong>Reverb:</strong> Dark plate, long tail on textures, short on vocals.</p>
+        <p><strong>Stereo:</strong> Verses narrow and tense. Choruses wide and heavy.</p>
+    </div>
+
+    <p class="hint">© 2026 Laura Johnston. All rights reserved.</p>
+
+<script>
+const sections = [
+  {
+    label: "Verse 1",
+    lines: [
+      { words: [{t:20.2,w:"Patterns"},{t:21.0,w:"forming"},{t:21.5,w:"before"},{t:21.9,w:"the"},{t:22.2,w:"footsteps,"}] },
+      { words: [{t:23.0,w:"Apologies"},{t:23.7,w:"arriving"},{t:24.3,w:"too"},{t:24.6,w:"soon,"}] },
+      { words: [{t:25.3,w:"Fear"},{t:25.8,w:"curling"},{t:26.4,w:"around"},{t:26.9,w:"the"},{t:27.2,w:"edges,"}] },
+      { words: [{t:28.0,w:"Paranoia"},{t:28.7,w:"blooming"},{t:29.3,w:"in"},{t:29.6,w:"the"},{t:29.9,w:"quiet."}] },
+      { words: [{t:30.8,w:"Deflection"},{t:31.5,w:"slipping"},{t:32.1,w:"from"},{t:32.5,w:"the"},{t:32.8,w:"weight,"}] },
+      { words: [{t:33.5,w:"Four"},{t:34.0,w:"tries"},{t:34.5,w:"to"},{t:34.8,w:"reach"},{t:35.2,w:"the"},{t:35.5,w:"truth,"}] },
+      { words: [{t:36.2,w:"Direct"},{t:36.8,w:"words"},{t:37.4,w:"cutting"},{t:37.9,w:"through"},{t:38.4,w:"the"},{t:38.7,w:"static,"}] },
+      { words: [{t:39.5,w:"Vulnerability"},{t:40.3,w:"finally"},{t:41.0,w:"landing."}] },
+    ]
+  },
+  {
+    label: "Chorus",
+    lines: [
+      { words: [{t:42.0,w:"Holding"},{t:42.7,w:"through"},{t:43.3,w:"the"},{t:43.6,w:"spirals,"}] },
+      { words: [{t:44.4,w:"Catching"},{t:45.1,w:"mid-collapse,"}] },
+      { words: [{t:46.0,w:"Naming"},{t:46.6,w:"what"},{t:47.0,w:"was"},{t:47.4,w:"hidden,"}] },
+      { words: [{t:48.2,w:"Steady"},{t:48.8,w:"hands"},{t:49.4,w:"in"},{t:49.7,w:"the"},{t:50.0,w:"dark."}] },
+      { words: [{t:50.9,w:"Holding,"},{t:51.5,w:"just"},{t:51.9,w:"holding,"}] },
+      { words: [{t:52.6,w:"Till"},{t:53.1,w:"the"},{t:53.4,w:"fear"},{t:53.9,w:"finds"},{t:54.4,w:"its"},{t:54.7,w:"shape."}] },
+      { words: [{t:55.6,w:"Walls"},{t:56.2,w:"shifting,"},{t:56.8,w:"not"},{t:57.2,w:"breaking,"}] },
+      { words: [{t:58.0,w:"More"},{t:58.5,w:"love,"},{t:59.0,w:"not"},{t:59.4,w:"less."}] },
+      { words: [{t:60.1,w:"Past"},{t:60.6,w:"mistakes"},{t:61.2,w:"as"},{t:61.5,w:"lessons,"}] },
+      { words: [{t:62.3,w:"Not"},{t:62.8,w:"definitions"},{t:63.6,w:"of"},{t:63.9,w:"now."}] },
+      { words: [{t:64.8,w:"Recognition"},{t:65.6,w:"rising\u2014"}] },
+      { words: [{t:66.3,w:"The"},{t:66.7,w:"mutual"},{t:67.3,w:"catching,"}] },
+      { words: [{t:68.0,w:"Both"},{t:68.5,w:"falling,"},{t:69.1,w:"both"},{t:69.5,w:"rising,"}] },
+      { words: [{t:70.2,w:"Both"},{t:70.7,w:"reaching"},{t:71.4,w:"across"},{t:71.9,w:"the"},{t:72.2,w:"distance."}] },
+    ]
+  },
+  {
+    label: "Bridge",
+    lines: [
+      { words: [{t:153.0,w:"No"},{t:153.4,w:"measuring,"},{t:154.1,w:"no"},{t:154.5,w:"thinking,"}] },
+      { words: [{t:155.2,w:"Just"},{t:155.7,w:"words"},{t:156.3,w:"pouring"},{t:156.9,w:"fast,"}] },
+      { words: [{t:157.6,w:"Presence"},{t:158.3,w:"becoming"},{t:159.0,w:"anchor,"}] },
+      { words: [{t:159.7,w:"Staying"},{t:160.3,w:"when"},{t:160.8,w:"leaving"},{t:161.4,w:"was"},{t:161.8,w:"easier."}] },
+    ]
+  },
+  {
+    label: "Final Chorus",
+    lines: [
+      { words: [{t:163.2,w:"Holding"},{t:163.9,w:"through"},{t:164.5,w:"the"},{t:164.8,w:"patterns,"}] },
+      { words: [{t:165.6,w:"Catching"},{t:166.3,w:"every"},{t:166.9,w:"fall,"}] },
+      { words: [{t:167.6,w:"Naming"},{t:168.2,w:"all"},{t:168.6,w:"the"},{t:169.0,w:"hidden"},{t:169.5,w:"things,"}] },
+      { words: [{t:170.3,w:"Steady"},{t:170.9,w:"when"},{t:171.4,w:"it"},{t:171.8,w:"breaks."}] },
+      { words: [{t:172.7,w:"Holding,"},{t:173.3,w:"just"},{t:173.7,w:"holding,"}] },
+      { words: [{t:174.4,w:"This"},{t:174.9,w:"is"},{t:175.3,w:"how"},{t:175.8,w:"survival"},{t:176.6,w:"tastes."}] },
+    ]
+  }
+];
+
+const wrap = document.getElementById('lyricsWrap');
+let allWords = [];
+
+sections.forEach(section => {
+  const secDiv = document.createElement('div');
+  secDiv.className = 'section';
+
+  const label = document.createElement('div');
+  label.className = 'section-label';
+  label.textContent = section.label;
+  secDiv.appendChild(label);
+
+  section.lines.forEach(line => {
+    const lineDiv = document.createElement('div');
+    lineDiv.className = 'lyric-line';
+
+    line.words.forEach((wordData, wi) => {
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = wordData.w + (wi < line.words.length - 1 ? ' ' : '');
+      lineDiv.appendChild(span);
+      allWords.push({ el: span, lineEl: lineDiv, t: wordData.t });
+    });
+
+    secDiv.appendChild(lineDiv);
+  });
+
+  wrap.appendChild(secDiv);
+});
+
+for (let i = 0; i < allWords.length; i++) {
+  allWords[i].nextT = i < allWords.length - 1 ? allWords[i+1].t : 99999;
+}
+
+const player = document.getElementById('player');
+let lastLit = null;
+let lastLine = null;
+
+player.addEventListener('timeupdate', () => {
+  const t = player.currentTime;
+  for (let i = 0; i < allWords.length; i++) {
+    const w = allWords[i];
+    if (t >= w.t && t < w.nextT) {
+      if (lastLit !== w.el) {
+        if (lastLit) lastLit.classList.remove('lit');
+        if (lastLine) lastLine.classList.remove('active');
+        w.el.classList.add('lit');
+        w.lineEl.classList.add('active');
+        lastLit = w.el;
+        lastLine = w.lineEl;
+      }
+      break;
+    }
+  }
+});
+
+document.getElementById('linerBtn').addEventListener('click', function() {
+  const notes = document.getElementById('linerNotes');
+  notes.classList.toggle('open');
+  this.textContent = notes.classList.contains('open') ? '✕ Close Liner Notes' : '📋 Liner Notes';
+});
+</script>
+</body>
+</html>
