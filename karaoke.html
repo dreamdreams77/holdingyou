@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holding You - Karaoke</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .artist {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .player {
+            margin-bottom: 30px;
+        }
+        
+        audio {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .lyrics {
+            font-size: 1.3em;
+            line-height: 2;
+            color: #333;
+            text-align: center;
+            min-height: 400px;
+        }
+        
+        .word {
+            display: inline;
+            margin: 0 0.15em;
+            transition: all 0.1s ease;
+            cursor: default;
+        }
+        
+        .word.active {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+        
+        .section-title {
+            font-weight: bold;
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .break {
+            height: 1em;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Holding You</h1>
+        <p class="artist">Laura Johnston</p>
+        
+        <div class="player">
+            <audio id="audioPlayer" controls>
+                <source src="holding-you.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+        
+        <div class="lyrics" id="lyrics"></div>
+        
+        <div class="controls">
+            <p>🎵 Lyrics highlight as you listen</p>
+        </div>
+    </div>
+
+    <script>
+        const lyrics = [
+            { time: 0.0, text: "Patterns" },
+            { time: 0.8, text: "forming" },
+            { time: 1.3, text: "before" },
+            { time: 1.7, text: "the" },
+            { time: 2.0, text: "footsteps," },
+            { time: 2.6, text: "Apologies" },
+            { time: 3.2, text: "arriving" },
+            { time: 3.8, text: "too" },
+            { time: 4.1, text: "soon," },
+            { time: 4.8, text: "Fear" },
+            { time: 5.3, text: "curling" },
+            { time: 5.9, text: "around" },
+            { time: 6.4, text: "the" },
+            { time: 6.7, text: "edges," },
+            { time: 7.4, text: "Paranoia" },
+            { time: 8.1, text: "blooming" },
+            { time: 8.7, text: "in" },
+            { time: 9.0, text: "the" },
+            { time: 9.3, text: "quiet." },
+            
+            { time: 10.2, text: "Deflection" },
+            { time: 10.9, text: "slipping" },
+            { time: 11.5, text: "from" },
+            { time: 11.9, text: "the" },
+            { time: 12.2, text: "weight," },
+            { time: 12.9, text: "Four" },
+            { time: 13.4, text: "tries" },
+            { time: 13.9, text: "to" },
+            { time: 14.2, text: "reach" },
+            { time: 14.6, text: "the" },
+            { time: 14.9, text: "truth," },
+            { time: 15.6, text: "Direct" },
+            { time: 16.2, text: "words" },
+            { time: 16.8, text: "cutting" },
+            { time: 17.3, text: "through" },
+            { time: 17.8, text: "the" },
+            { time: 18.1, text: "static," },
+            { time: 18.9, text: "Vulnerability" },
+            { time: 19.7, text: "finally" },
+            { time: 20.4, text: "landing." },
+            
+            { time: 21.5, text: "Holding" },
+            { time: 22.2, text: "through" },
+            { time: 22.8, text: "the" },
+            { time: 23.1, text: "spirals," },
+            { time: 23.9, text: "Catching" },
+            { time: 24.6, text: "mid-collapse," },
+            { time: 25.5, text: "Naming" },
+            { time: 26.1, text: "what" },
+            { time: 26.5, text: "was" },
+            { time: 26.9, text: "hidden," },
+            { time: 27.7, text: "Steady" },
+            { time: 28.3, text: "hands" },
+            { time: 28.9, text: "in" },
+            { time: 29.2, text: "the" },
+            { time: 29.5, text: "dark." },
+            
+            { time: 30.4, text: "Holding," },
+            { time: 31.0, text: "just" },
+            { time: 31.4, text: "holding," },
+            { time: 32.1, text: "Till" },
+            { time: 32.6, text: "the" },
+            { time: 32.9, text: "fear" },
+            { time: 33.4, text: "finds" },
+            { time: 33.9, text: "its" },
+            { time: 34.2, text: "shape." },
+            
+            { time: 35.2, text: "Walls" },
+            { time: 35.8, text: "shifting," },
+            { time: 36.4, text: "not" },
+            { time: 36.8, text: "breaking," },
+            { time: 37.5, text: "More" },
+            { time: 38.0, text: "love," },
+            { time: 38.5, text: "not" },
+            { time: 38.9, text: "less." },
+            { time: 39.6, text: "Past" },
+            { time: 40.1, text: "mistakes" },
+            { time: 40.7, text: "as" },
+            { time: 41.0, text: "lessons," },
+            { time: 41.8, text: "Not" },
+            { time: 42.3, text: "definitions" },
+            { time: 43.1, text: "of" },
+            { time: 43.4, text: "now." },
+            
+            { time: 44.3, text: "Recognition" },
+            { time: 45.1, text: "rising—" },
+            { time: 45.8, text: "The" },
+            { time: 46.2, text: "mutual" },
+            { time: 46.8, text: "catching," },
+            { time: 47.5, text: "Both" },
+            { time: 48.0, text: "falling," },
+            { time: 48.6, text: "both" },
+            { time: 49.0, text: "rising," },
+            { time: 49.7, text: "Both" },
+            { time: 50.2, text: "reaching" },
+            { time: 50.9, text: "across" },
+            { time: 51.4, text: "the" },
+            { time: 51.7, text: "distance." },
+            
+            { time: 53.0, text: "No" },
+            { time: 53.4, text: "measuring," },
+            { time: 54.1, text: "no" },
+            { time: 54.5, text: "thinking," },
+            { time: 55.2, text: "Just" },
+            { time: 55.7, text: "words" },
+            { time: 56.3, text: "pouring" },
+            { time: 56.9, text: "fast," },
+            { time: 57.6, text: "Presence" },
+            { time: 58.3, text: "becoming" },
+            { time: 59.0, text: "anchor," },
+            { time: 59.7, text: "Staying" },
+            { time: 60.3, text: "when" },
+            { time: 60.8, text: "leaving" },
+            { time: 61.4, text: "was" },
+            { time: 61.8, text: "easier." },
+            
+            { time: 63.2, text: "Holding" },
+            { time: 63.9, text: "through" },
+            { time: 64.5, text: "the" },
+            { time: 64.8, text: "patterns," },
+            { time: 65.6, text: "Catching" },
+            { time: 66.3, text: "every" },
+            { time: 66.9, text: "fall," },
+            { time: 67.6, text: "Naming" },
+            { time: 68.2, text: "all" },
+            { time: 68.6, text: "the" },
+            { time: 69.0, text: "hidden" },
+            { time: 69.5, text: "things," },
+            { time: 70.3, text: "Steady" },
+            { time: 70.9, text: "when" },
+            { time: 71.4, text: "it" },
+            { time: 71.8, text: "breaks." },
+            
+            { time: 72.7, text: "Holding," },
+            { time: 73.3, text: "just" },
+            { time: 73.7, text: "holding," },
+            { time: 74.4, text: "This" },
+            { time: 74.9, text: "is" },
+            { time: 75.3, text: "how" },
+            { time: 75.8, text: "survival" },
+            { time: 76.6, text: "tastes." },
+        ];
+
+        const audioPlayer = document.getElementById('audioPlayer');
+        const lyricsDiv = document.getElementById('lyrics');
+        let currentWordIndex = 0;
+
+        // Create lyrics HTML
+        function createLyricsHTML() {
+            let html = '<span class="section-title">Verse 1</span><br>';
+            let lineCount = 0;
+            
+            lyrics.forEach((word, index) => {
+                html += `<span class="word" data-index="${index}">${word.text}</span> `;
+                lineCount++;
+                
+                if (word.text.endsWith('.') || word.text.endsWith('—')) {
+                    html += '<br>';
+                    lineCount = 0;
+                }
+                
+                // Section breaks (approximate based on timing)
+                if (index === 39) html += '<span class="section-title">Chorus</span><br>';
+                if (index === 67) html += '<span class="section-title">Bridge</span><br>';
+                if (index === 77) html += '<span class="section-title">Final Chorus</span><br>';
+            });
+            
+            lyricsDiv.innerHTML = html;
+        }
+
+        // Highlight words
+        function updateLyrics() {
+            const currentTime = audioPlayer.currentTime;
+            
+            lyrics.forEach((word, index) => {
+                const wordElement = document.querySelector(`[data-index="${index}"]`);
+                if (!wordElement) return;
+                
+                const nextWord = lyrics[index + 1];
+                const nextTime = nextWord ? nextWord.time : 221; // Song length
+                
+                if (currentTime >= word.time && currentTime < nextTime) {
+                    wordElement.classList.add('active');
+                } else {
+                    wordElement.classList.remove('active');
+                }
+            });
+        }
+
+        // Event listeners
+        audioPlayer.addEventListener('timeupdate', updateLyrics);
+        audioPlayer.addEventListener('play', () => {
+            lyricsDiv.style.opacity = '1';
+        });
+
+        // Initialize
+        createLyricsHTML();
+    </script>
+</body>
+</html>
